@@ -1,0 +1,74 @@
+# Build output
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+# Publish artifacts
+publish/
+wwwroot/dist/
+
+# ASP.NET user-specific files
+appsettings.*.Local.json
+secrets.json
+
+# EF Core Migrations
+Migrations/**/*.Designer.cs
+
+# Database files
+*.mdf
+*.ldf
+
+# Test results
+TestResults/
+*.trx
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# Others
+.vscode-test/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Terraform artifacts (optional for this repo)
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Docker
+docker-compose.override.yml
+
+# End of file

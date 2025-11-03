@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql
+      - ./Infrastructure/database:/docker-entrypoint-initdb.d
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "3080:80"
+    depends_on:
+      - database
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./Infrastructure/pgadmin/servers.json:/pgadmin4/servers.json
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    environment:
+      - SERVICES=sns,sqs,secretsmanager,ssm, apigateway
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  terraform:
+    build:
+      context: ./Infrastructure/terraform
+      dockerfile: Dockerfile
+    container_name: mentoria_terraform
+    working_dir: /infra
+    volumes:
+      - ./Infrastructure:/infra
+    tty: true
+    entrypoint: /bin/sh
+    depends_on:
+      - localstack
+    environment:
+      AWS_ENDPOINT_URL: http://localstack:4566
+      LOCALSTACK_HOST: localstack
+      LOCALSTACK_PORT: 4566
+
+volumes:
+  db_data:
+  localstack_data:
+  pgadmin_data:

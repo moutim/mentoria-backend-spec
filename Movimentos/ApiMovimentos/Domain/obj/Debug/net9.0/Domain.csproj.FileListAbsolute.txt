@@ -1,0 +1,12 @@
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/bin/Debug/net9.0/Domain.deps.json
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/bin/Debug/net9.0/Domain.dll
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/bin/Debug/net9.0/Domain.pdb
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.AssemblyInfoInputs.cache
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.AssemblyInfo.cs
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.csproj.CoreCompileInputs.cache
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.sourcelink.json
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.dll
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/refint/Domain.dll
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/Domain.pdb
+/Users/vitormoutim/Documents/repos/mentoria-backend-spec/Movimentos/ApiMovimentos/Domain/obj/Debug/net9.0/ref/Domain.dll

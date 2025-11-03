@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "mentoria_db": {
+      "Name": "mentoria_db",
+      "Group": "Servers",
+      "Host": "database",
+      "Port": 5432,
+      "Username": "postgres",
+      "SSLMode": "disable",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}

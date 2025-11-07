@@ -1,5 +1,6 @@
 using System.Reflection;
 using Infrastructure.Data;
+using Infrastructure.DependencyInjection;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddMemoryCache();
+
+// Configuração do Parameter Store
+builder.Services.AddParameterStore();
 
 // Configuração do Swagger/OpenAPI
 builder.Services.AddSwaggerGen(c =>

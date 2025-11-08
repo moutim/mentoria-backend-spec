@@ -1,6 +1,6 @@
+using Application.Commands.CriarMovimento;
 using Application.DTOs.Requests;
-using Application.Features.Movimentos.Commands;
-using Application.Features.Movimentos.Queries;
+using Application.Queries.MovimentosByConta;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,52 +18,32 @@ public class MovimentosController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllByConta(
+        [FromQuery(Name = "usuarioId")] string? usuarioId)
     {
-        var movimentos = await _mediator.Send(new ObterTodosMovimentosQuery());
-        return Ok(movimentos);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var movimento = await _mediator.Send(new ObterMovimentoPorIdQuery(id));
-        if (movimento == null)
-            return NotFound();
-
-        return Ok(movimento);
-    }
-
-    [HttpGet("conta/{contaId}")]
-    public async Task<IActionResult> GetByContaId(int contaId)
-    {
-        var movimentos = await _mediator.Send(new ObterMovimentosPorContaQuery(contaId));
+        var query = new MovimentosByContaQuery
+        {
+            UsuarioId = usuarioId ?? string.Empty
+        };
+        var movimentos = await _mediator.Send(query);
         return Ok(movimentos);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CriarMovimentoRequest request)
+    public async Task<IActionResult> Create([FromBody] CriarMovimentoRequest request)
     {
-        try
+        var command = new CriarMovimentoCommand
         {
-            var command = new CriarMovimentoCommand
-            {
-                ContaId = request.ContaId,
-                Valor = request.Valor,
-                Tipo = request.Tipo
-            };
-            
-            var id = await _mediator.Send(command);
-            var movimento = await _mediator.Send(new ObterMovimentoPorIdQuery(id));
-            return CreatedAtAction(nameof(GetById), new { id }, movimento);
-        }
-        catch (ArgumentException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+            UsuarioId = request.UsuarioId,
+            Remetente = request.Remetente,
+            Destinatario = request.Destinatario,
+            Tipo = request.Tipo,
+            CategoriaId = request.CategoriaId,
+            Descricao = request.Descricao,
+            Valor = request.Valor
+        };
+
+        var movimento = await _mediator.Send(command);
+        return CreatedAtAction(nameof(Create), new { id = movimento.Id }, movimento);
     }
 }

@@ -1,8 +1,4 @@
-using System.Reflection;
-using Infrastructure.Data;
 using Infrastructure.DependencyInjection;
-using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +7,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
 
-// Configuração do Parameter Store
-builder.Services.AddParameterStore();
+// Configuração de injeção de dependência
+builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddRepositories();
+builder.Services.AddMediatorHandlers();
 
 // Configuração do Swagger/OpenAPI
 builder.Services.AddSwaggerGen(c =>
@@ -28,27 +26,8 @@ builder.Services.AddSwaggerGen(c =>
             Email = "suporte@apimovement.com"
         }
     });
-
-    // Adiciona comentários XML se você quiser documentar com /// comments
-    var xmlFile = "WebApi.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-    {
-        c.IncludeXmlComments(xmlPath);
-    }
 });
 
-// Configure DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Register repositories
-builder.Services.AddScoped<IContaRepository, ContaRepository>();
-builder.Services.AddScoped<IMovimentoRepository, MovimentoRepository>();
-
-// Register MediatR
-builder.Services.AddMediatR(cfg => 
-    cfg.RegisterServicesFromAssembly(Assembly.Load("Application")));
 
 var app = builder.Build();
 
@@ -63,11 +42,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Create database and apply migrations
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated();
-}
 
 app.Run();

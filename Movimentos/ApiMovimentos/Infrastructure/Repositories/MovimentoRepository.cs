@@ -1,3 +1,4 @@
+using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -15,21 +16,21 @@ public class MovimentoRepository : IMovimentoRepository
 
     public async Task<IEnumerable<Movimento>> GetAllAsync()
     {
-        return await _context.Movimentos.Include(m => m.Conta).ToListAsync();
+        return await _context.Movimentos.Include(m => m.Categoria).ToListAsync();
     }
 
-    public async Task<IEnumerable<Movimento>> GetByContaIdAsync(int contaId)
+    public async Task<IEnumerable<Movimento>> GetByUsuarioIdAsync(string usuarioId)
     {
         return await _context.Movimentos
-            .Include(m => m.Conta)
-            .Where(m => m.ContaId == contaId)
+            .Include(m => m.Categoria)
+            .Where(m => m.UsuarioId == usuarioId)
             .ToListAsync();
     }
 
     public async Task<Movimento?> GetByIdAsync(int id)
     {
         return await _context.Movimentos
-            .Include(m => m.Conta)
+            .Include(m => m.Categoria)
             .FirstOrDefaultAsync(m => m.Id == id);
     }
 

@@ -41,6 +41,22 @@ services:
       - localstack_data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
 
+  api-movimentos:
+    build:
+      context: ./Movimentos/ApiMovimentos
+      dockerfile: WebApi/Dockerfile
+    container_name: api-movimentos
+    ports:
+      - "5001:8080"
+    environment:
+      - AWS__ServiceURL=http://localstack:4566
+      - AWS__Region=us-east-1
+      - AWS__AccessKey=test
+      - AWS__SecretKey=test
+    depends_on:
+      - database
+      - localstack
+
   terraform:
     build:
       context: ./Infrastructure/terraform

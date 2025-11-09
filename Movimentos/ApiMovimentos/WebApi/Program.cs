@@ -13,6 +13,7 @@ await builder.Configuration.ConfigureParameterStoreAsync();
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddRepositories();
 builder.Services.AddMediatorHandlers();
+builder.Services.AddEventBus(builder.Configuration);
 
 // Configuração do Swagger/OpenAPI
 builder.Services.AddSwaggerGen(c =>

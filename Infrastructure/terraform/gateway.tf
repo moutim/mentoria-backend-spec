@@ -1,69 +1,94 @@
-
-resource "aws_api_gateway_rest_api" "example" {
-  name = "example-api"
+# ========================================
+# API Gateway - REST API
+# ========================================
+# Cria a API Gateway principal
+resource "aws_api_gateway_rest_api" "movimentos_api" {
+  name        = "movimentos-api"
+  description = "API Gateway para gerenciamento de movimentos financeiros"
 }
 
-resource "aws_api_gateway_resource" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
-  parent_id   = aws_api_gateway_rest_api.example.root_resource_id
-  path_part   = "hello"
-
-  depends_on = [aws_api_gateway_rest_api.example]
+# ========================================
+# Recursos (Paths)
+# ========================================
+# Cria o recurso /api
+resource "aws_api_gateway_resource" "api" {
+  rest_api_id = aws_api_gateway_rest_api.movimentos_api.id
+  parent_id   = aws_api_gateway_rest_api.movimentos_api.root_resource_id
+  path_part   = "api"
 }
 
-resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.example.id
-  resource_id   = aws_api_gateway_resource.proxy.id
+# Cria o recurso /api/movimentos
+resource "aws_api_gateway_resource" "movimentos" {
+  rest_api_id = aws_api_gateway_rest_api.movimentos_api.id
+  parent_id   = aws_api_gateway_resource.api.id
+  path_part   = "movimentos"
+}
+
+# ========================================
+# Método GET /api/movimentos
+# ========================================
+# Define o método HTTP GET
+resource "aws_api_gateway_method" "get_movimentos" {
+  rest_api_id   = aws_api_gateway_rest_api.movimentos_api.id
+  resource_id   = aws_api_gateway_resource.movimentos.id
   http_method   = "GET"
   authorization = "NONE"
 
-  depends_on = [aws_api_gateway_resource.proxy]
+  request_parameters = {
+    "method.request.querystring.usuarioId" = false
+  }
 }
 
-resource "aws_api_gateway_integration" "proxy" {
-  rest_api_id             = aws_api_gateway_rest_api.example.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy.http_method
-  type                    = "MOCK"
+# Integração HTTP do GET - aponta para sua API real
+resource "aws_api_gateway_integration" "get_movimentos" {
+  rest_api_id             = aws_api_gateway_rest_api.movimentos_api.id
+  resource_id             = aws_api_gateway_resource.movimentos.id
+  http_method             = aws_api_gateway_method.get_movimentos.http_method
+  type                    = "HTTP_PROXY"
   integration_http_method = "GET"
-  request_templates = {
-    "application/json" = "{ \"statusCode\": 200 }"
-  }
+  uri                     = "http://host.docker.internal:5001/api/movimentos"
 
-  depends_on = [aws_api_gateway_method.proxy]
+  request_parameters = {
+    "integration.request.querystring.usuarioId" = "method.request.querystring.usuarioId"
+  }
 }
 
-resource "aws_api_gateway_method_response" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.proxy.http_method
-  status_code = "200"
-
-  response_models = {
-    "application/json" = "Empty"
-  }
-
-  depends_on = [aws_api_gateway_method.proxy]
+# ========================================
+# Método POST /api/movimentos
+# ========================================
+# Define o método HTTP POST
+resource "aws_api_gateway_method" "post_movimentos" {
+  rest_api_id   = aws_api_gateway_rest_api.movimentos_api.id
+  resource_id   = aws_api_gateway_resource.movimentos.id
+  http_method   = "POST"
+  authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration_response" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.proxy.http_method
-  status_code = "200"
-
-  response_templates = {
-    "application/json" = "{ \"message\": \"Hello from LocalStack\" }"
-  }
-
-  depends_on = [aws_api_gateway_integration.proxy]
+# Integração HTTP do POST - aponta para sua API real
+resource "aws_api_gateway_integration" "post_movimentos" {
+  rest_api_id             = aws_api_gateway_rest_api.movimentos_api.id
+  resource_id             = aws_api_gateway_resource.movimentos.id
+  http_method             = aws_api_gateway_method.post_movimentos.http_method
+  type                    = "HTTP_PROXY"
+  integration_http_method = "POST"
+  uri                     = "http://host.docker.internal:5001/api/movimentos"
 }
 
-resource "aws_api_gateway_deployment" "example" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
+# ========================================
+# Deploy e Stage
+# ========================================
+# Deploy da API
+resource "aws_api_gateway_deployment" "movimentos_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.movimentos_api.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.example.body))
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.movimentos.id,
+      aws_api_gateway_method.get_movimentos.id,
+      aws_api_gateway_method.post_movimentos.id,
+      aws_api_gateway_integration.get_movimentos.id,
+      aws_api_gateway_integration.post_movimentos.id,
+    ]))
   }
 
   lifecycle {
@@ -71,15 +96,29 @@ resource "aws_api_gateway_deployment" "example" {
   }
 
   depends_on = [
-    aws_api_gateway_integration_response.proxy,
-    aws_api_gateway_method_response.proxy
+    aws_api_gateway_integration.get_movimentos,
+    aws_api_gateway_integration.post_movimentos
   ]
 }
 
-resource "aws_api_gateway_stage" "example" {
-  deployment_id = aws_api_gateway_deployment.example.id
-  rest_api_id   = aws_api_gateway_rest_api.example.id
+# Stage de desenvolvimento
+resource "aws_api_gateway_stage" "dev" {
+  deployment_id = aws_api_gateway_deployment.movimentos_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.movimentos_api.id
   stage_name    = "dev"
+}
 
-  depends_on = [aws_api_gateway_deployment.example]
+# ========================================
+# Outputs
+# ========================================
+# URL base da API Gateway
+output "api_gateway_url" {
+  value       = "http://localhost:4566/restapis/${aws_api_gateway_rest_api.movimentos_api.id}/dev/_user_request_"
+  description = "URL base do API Gateway no LocalStack"
+}
+
+# ID da API
+output "api_gateway_id" {
+  value       = aws_api_gateway_rest_api.movimentos_api.id
+  description = "ID da API Gateway"
 }

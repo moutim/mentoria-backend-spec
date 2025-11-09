@@ -2,10 +2,12 @@ using Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
+
+// Configuração do Parameter Store da AWS
+await builder.Configuration.ConfigureParameterStoreAsync();
 
 // Configuração de injeção de dependência
 builder.Services.AddDatabase(builder.Configuration);

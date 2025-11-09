@@ -14,10 +14,13 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Define schema padrão como public
+        modelBuilder.HasDefaultSchema("public");
+
         // Configure Categoria table
         modelBuilder.Entity<Categoria>(entity =>
         {
-            entity.ToTable("categorias");
+            entity.ToTable("categorias", "public");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Nome)
@@ -29,7 +32,7 @@ public class AppDbContext : DbContext
         // Configure Movimento table
         modelBuilder.Entity<Movimento>(entity =>
         {
-            entity.ToTable("movimentos");
+            entity.ToTable("movimentos", "public");
             entity.HasKey(e => e.Id);
             
             entity.Property(e => e.Id).HasColumnName("id");
